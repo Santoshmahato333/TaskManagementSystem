@@ -40,9 +40,19 @@ DataLayer/
 *.db
 *.db-shm
 *.db-wal
+*.mdf
+*.ldf
+
+# Configuration files with sensitive data
+appsettings.json
+appsettings.Development.json
+appsettings.Production.json
 
 # Entity Framework Migrations
 Migrations/
+
+# Launch settings (contains local URLs)
+**/Properties/launchSettings.json
 
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
