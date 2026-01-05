@@ -1,0 +1,137 @@
+@using TaskStatus = TaskManagementSystem.Models.TaskStatus
+@model TaskItem
+@{
+    ViewData["Title"] = "Task Details";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="bi bi-eye"></i> Task Details</h1>
+    <div>
+        <a asp-action="EditTask" asp-route-id="@Model.TaskId" class="btn btn-warning">
+            <i class="bi bi-pencil"></i> Edit
+        </a>
+        <a asp-action="TaskList" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card shadow mb-3">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">@Model.Title</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Description:</strong>
+                        <p>@(Model.Description ?? "No description provided")</p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <strong>Assigned To:</strong>
+                        <p><i class="bi bi-person-fill"></i> @Model.AssignedToUser.FullName</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Created By:</strong>
+                        <p><i class="bi bi-person-badge"></i> @Model.CreatedByUser.FullName</p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <strong>Priority:</strong><br>
+                        @switch (Model.Priority)
+                        {
+                            case TaskPriority.Low:
+                                <span class="badge bg-secondary">Low</span>
+                                break;
+                            case TaskPriority.Medium:
+                                <span class="badge bg-info">Medium</span>
+                                break;
+                            case TaskPriority.High:
+                                <span class="badge bg-warning">High</span>
+                                break;
+                            case TaskPriority.Critical:
+                                <span class="badge bg-danger">Critical</span>
+                                break;
+                        }
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Status:</strong><br>
+                        @switch (Model.Status)
+                        {
+                            case TaskStatus.Pending:
+                                <span class="badge bg-warning">Pending</span>
+                                break;
+                            case TaskStatus.InProgress:
+                                <span class="badge bg-info">In Progress</span>
+                                break;
+                            case TaskStatus.Completed:
+                                <span class="badge bg-success">Completed</span>
+                                break;
+                            case TaskStatus.Cancelled:
+                                <span class="badge bg-danger">Cancelled</span>
+                                break;
+                        }
+                    </div>
+                    <div class="col-md-4">
+                        <strong>Department:</strong>
+                        <p>@Model.Department.DepartmentName</p>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Created Date:</strong>
+                        <p>@Model.CreatedDate.ToString("MMMM dd, yyyy hh:mm tt")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Due Date:</strong>
+                        <p class="@(Model.DueDate < DateTime.Now && Model.Status != TaskStatus.Completed ? "text-danger" : "")">
+                            @(Model.DueDate?.ToString("MMMM dd, yyyy hh:mm tt") ?? "Not set")
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <h6 class="mb-0"><i class="bi bi-clock-history"></i> Task History</h6>
+            </div>
+            <div class="card-body" style="max-height: 400px; overflow-y: auto;">
+                @if (Model.TaskUpdates.Any())
+                {
+                    @foreach (var update in Model.TaskUpdates.OrderByDescending(u => u.UpdatedDate))
+                    {
+                        <div class="mb-3 pb-3 border-bottom">
+                            <small class="text-muted">@update.UpdatedDate.ToString("MMM dd, yyyy hh:mm tt")</small>
+                            <p class="mb-1"><strong>@update.UpdatedByUser.FullName</strong></p>
+                            @if (update.OldStatus.HasValue && update.NewStatus.HasValue)
+                            {
+                                <p class="mb-1">
+                                    Status: <span class="badge bg-secondary">@update.OldStatus</span> → 
+                                    <span class="badge bg-primary">@update.NewStatus</span>
+                                </p>
+                            }
+                            @if (!string.IsNullOrEmpty(update.UpdateDescription))
+                            {
+                                <p class="mb-0">@update.UpdateDescription</p>
+                            }
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p class="text-muted">No updates yet</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>

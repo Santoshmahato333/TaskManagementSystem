@@ -1,0 +1,69 @@
+@using TaskStatus = TaskManagementSystem.Models.TaskStatus
+@model List<TaskItem>
+@{
+    ViewData["Title"] = "Department Reports";
+    var departmentName = User.FindFirst("DepartmentName")?.Value;
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="bi bi-file-earmark-bar-graph"></i> Department Reports</h1>
+    <button onclick="window.print()" class="btn btn-primary">
+        <i class="bi bi-printer"></i> Print Report
+    </button>
+</div>
+
+<div class="card shadow mb-3">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">@departmentName Department - Task Report</h5>
+    </div>
+    <div class="card-body">
+        <div class="row text-center mb-4">
+            <div class="col-md-3">
+                <h3 class="text-primary">@Model.Count</h3>
+                <p class="text-muted">Total Tasks</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="text-warning">@Model.Count(t => t.Status == TaskStatus.Pending)</h3>
+                <p class="text-muted">Pending</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="text-info">@Model.Count(t => t.Status == TaskStatus.InProgress)</h3>
+                <p class="text-muted">In Progress</p>
+            </div>
+            <div class="col-md-3">
+                <h3 class="text-success">@Model.Count(t => t.Status == TaskStatus.Completed)</h3>
+                <p class="text-muted">Completed</p>
+            </div>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-bordered table-sm">
+                <thead class="table-light">
+                    <tr>
+                        <th>Task ID</th>
+                        <th>Title</th>
+                        <th>Assigned To</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Created Date</th>
+                        <th>Due Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var task in Model)
+                    {
+                        <tr>
+                            <td>@task.TaskId</td>
+                            <td>@task.Title</td>
+                            <td>@task.AssignedToUser.FullName</td>
+                            <td>@task.Priority</td>
+                            <td>@task.Status</td>
+                            <td>@task.CreatedDate.ToString("MMM dd, yyyy")</td>
+                            <td>@(task.DueDate?.ToString("MMM dd, yyyy") ?? "N/A")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

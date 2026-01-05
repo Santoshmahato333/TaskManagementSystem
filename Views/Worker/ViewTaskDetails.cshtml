@@ -1,0 +1,160 @@
+@using TaskStatus = TaskManagementSystem.Models.TaskStatus
+@model TaskItem
+@{
+    ViewData["Title"] = "Task Details";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <div>
+        <h1 class="h2 mb-0"><i class="bi bi-card-checklist"></i> @Model.Title</h1>
+        <small class="text-muted">@Model.Department.DepartmentName Department</small>
+    </div>
+    <a asp-action="MyTasks" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to My Tasks
+    </a>
+</div>
+
+<div class="row">
+    <!-- Task Details Card -->
+    <div class="col-md-8">
+        <div class="card shadow mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0 d-flex justify-content-between align-items-center">
+                    <span>Task Information</span>
+                    <span class="badge @(Model.DueDate < DateTime.Now && Model.Status != TaskStatus.Completed ? "bg-danger" : "bg-info")">
+                        @Model.Status
+                    </span>
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Description:</label>
+                        <p class="form-control-plaintext">@(Model.Description ?? "No description provided")</p>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Created By:</label>
+                        <p class="form-control-plaintext">
+                            <i class="bi bi-person-fill"></i> @Model.CreatedByUser.FullName
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Priority:</label>
+                        <p class="form-control-plaintext">
+                            @switch (Model.Priority)
+                            {
+                                case TaskPriority.Low: <span class="badge bg-secondary">Low</span> break;
+                                case TaskPriority.Medium: <span class="badge bg-info">Medium</span> break;
+                                case TaskPriority.High: <span class="badge bg-warning">High</span> break;
+                                case TaskPriority.Critical: <span class="badge bg-danger">Critical</span> break;
+                            }
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Due Date:</label>
+                        <p class="form-control-plaintext @(Model.DueDate < DateTime.Now && Model.Status != TaskStatus.Completed ? "text-danger fw-bold" : "")">
+                            @(Model.DueDate?.ToString("MMMM dd, yyyy hh:mm tt") ?? "No deadline set")
+                        </p>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">Created:</label>
+                        <p class="form-control-plaintext">@Model.CreatedDate.ToString("MMMM dd, yyyy hh:mm tt")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Status Update Card -->
+    <div class="col-md-4">
+        <div class="card shadow sticky-top" style="top: 20px;">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="bi bi-arrow-clockwise"></i> Update Status</h6>
+            </div>
+            <div class="card-body">
+                <form method="post" asp-action="UpdateTaskStatus" asp-route-taskId="@Model.TaskId">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">New Status</label>
+                        <select name="NewStatus" class="form-select" required>
+                            <option value="" disabled>@Model.Status</option>
+                            @if (Model.Status != TaskStatus.InProgress)
+                            {
+                                <option value="InProgress">In Progress</option>
+                            }
+                            @if (Model.Status != TaskStatus.Completed)
+                            {
+                                <option value="Completed">Completed</option>
+                            }
+                            @if (Model.Status != TaskStatus.Cancelled)
+                            {
+                                <option value="Cancelled">Cancelled</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Update Notes (Optional)</label>
+                        <textarea name="UpdateDescription" class="form-control" rows="3" placeholder="Add update notes..."></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">
+                        <i class="bi bi-check-lg"></i> Update Status
+                    </button>
+                </form>
+
+                <hr />
+
+                <form method="post" asp-action="AddTaskUpdate" asp-route-taskId="@Model.TaskId">
+                    <div class="mb-3">
+                        <label class="form-label">Quick Update</label>
+                        <textarea name="updateDescription" class="form-control" rows="2" placeholder="Quick progress update..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                        <i class="bi bi-plus-circle"></i> Add Update
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task History -->
+<div class="card shadow mt-4">
+    <div class="card-header bg-light">
+        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Task Update History</h5>
+    </div>
+    <div class="card-body" style="max-height: 500px; overflow-y: auto;">
+        @if (Model.TaskUpdates.Any())
+        {
+            @foreach (var update in Model.TaskUpdates.OrderByDescending(u => u.UpdatedDate))
+            {
+                <div class="border-bottom pb-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <strong>@update.UpdatedByUser.FullName</strong>
+                            <small class="text-muted ms-2">• @update.UpdatedDate.ToString("MMM dd, yyyy hh:mm tt")</small>
+                        </div>
+                        @if (update.OldStatus.HasValue && update.NewStatus.HasValue)
+                        {
+                            <span class="badge bg-primary">
+                                @update.OldStatus → @update.NewStatus
+                            </span>
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(update.UpdateDescription))
+                    {
+                        <p class="mb-0 mt-1">@update.UpdateDescription</p>
+                    }
+                </div>
+            }
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-clock text-muted" style="font-size: 3rem;"></i>
+                <p class="text-muted mt-2">No updates yet</p>
+            </div>
+        }
+    </div>
+</div>

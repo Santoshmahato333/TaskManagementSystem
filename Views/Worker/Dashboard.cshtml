@@ -1,0 +1,101 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Worker Dashboard";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="bi bi-speedometer2"></i> My Dashboard</h1>
+    <div class="text-muted">
+        <span>Welcome, <strong>@Model.UserFullName</strong></span>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card text-white bg-primary shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2">My Tasks</h6>
+                        <h2 class="mb-0">@Model.TotalTasks</h2>
+                    </div>
+                    <div>
+                        <i class="bi bi-list-task" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-warning shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2">Pending</h6>
+                        <h2 class="mb-0">@Model.PendingTasks</h2>
+                    </div>
+                    <div>
+                        <i class="bi bi-clock" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-info shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2">In Progress</h6>
+                        <h2 class="mb-0">@Model.InProgressTasks</h2>
+                    </div>
+                    <div>
+                        <i class="bi bi-arrow-repeat" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card text-white bg-success shadow">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h6 class="card-subtitle mb-2">Completed</h6>
+                        <h2 class="mb-0">@Model.CompletedTasks</h2>
+                    </div>
+                    <div>
+                        <i class="bi bi-check-circle" style="font-size: 3rem; opacity: 0.5;"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-calendar-x text-warning"></i> Overdue Tasks</h5>
+                <h2 class="display-4 text-warning">@Model.OverdueTasks</h2>
+                <a asp-action="MyTasks" class="btn btn-sm btn-outline-warning mt-2">
+                    <i class="bi bi-arrow-right"></i> View All Tasks
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-body">
+                <h5 class="card-title"><i class="bi bi-building"></i> Department</h5>
+                <h3 class="text-primary">@Model.DepartmentName</h3>
+                <p class="text-muted">Your assigned department</p>
+            </div>
+        </div>
+    </div>
+</div>
