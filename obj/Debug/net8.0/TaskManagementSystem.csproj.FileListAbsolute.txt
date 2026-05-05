@@ -136,3 +136,4 @@ C:\Users\Hivenevigator\Desktop\TaskManagementSystem\obj\Debug\net8.0\refint\Task
 C:\Users\Hivenevigator\Desktop\TaskManagementSystem\obj\Debug\net8.0\TaskManagementSystem.pdb
 C:\Users\Hivenevigator\Desktop\TaskManagementSystem\obj\Debug\net8.0\TaskManagementSystem.genruntimeconfig.cache
 C:\Users\Hivenevigator\Desktop\TaskManagementSystem\obj\Debug\net8.0\ref\TaskManagementSystem.dll
+C:\Users\Hivenevigator\Desktop\TaskManagementSystem\obj\Debug\net8.0\TaskManagementSystem.sourcelink.json
