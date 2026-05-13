@@ -21,8 +21,14 @@
             <div class="card-header bg-primary text-white">
                 <h5 class="mb-0 d-flex justify-content-between align-items-center">
                     <span>Task Information</span>
-                    <span class="badge @(Model.DueDate < DateTime.Now && Model.Status != TaskStatus.Completed ? "bg-danger" : "bg-info")">
-                        @Model.Status
+                    <span class="d-flex align-items-center gap-2">
+                        @if (Model.Status == TaskStatus.InProgress && Model.TaskUpdates.Any(u => u.UpdateDescription != null && u.UpdateDescription.Contains("admin approval", StringComparison.OrdinalIgnoreCase)))
+                        {
+                            <span class="badge bg-warning text-dark">Awaiting Admin Approval</span>
+                        }
+                        <span class="badge @(Model.DueDate < DateTime.Now && Model.Status != TaskStatus.Completed ? "bg-danger" : "bg-info")">
+                            @Model.Status
+                        </span>
                     </span>
                 </h5>
             </div>
@@ -44,12 +50,21 @@
                     <div class="col-md-4">
                         <label class="form-label fw-bold">Priority:</label>
                         <p class="form-control-plaintext">
-                            @switch (Model.Priority)
+                            @if (Model.Priority == TaskPriority.Low)
                             {
-                                case TaskPriority.Low: <span class="badge bg-secondary">Low</span> break;
-                                case TaskPriority.Medium: <span class="badge bg-info">Medium</span> break;
-                                case TaskPriority.High: <span class="badge bg-warning">High</span> break;
-                                case TaskPriority.Critical: <span class="badge bg-danger">Critical</span> break;
+                                <span class="badge bg-secondary">Low</span>
+                            }
+                            else if (Model.Priority == TaskPriority.Medium)
+                            {
+                                <span class="badge bg-info">Medium</span>
+                            }
+                            else if (Model.Priority == TaskPriority.High)
+                            {
+                                <span class="badge bg-warning">High</span>
+                            }
+                            else if (Model.Priority == TaskPriority.Critical)
+                            {
+                                <span class="badge bg-danger">Critical</span>
                             }
                         </p>
                     </div>
@@ -64,6 +79,18 @@
                         <p class="form-control-plaintext">@Model.CreatedDate.ToString("MMMM dd, yyyy hh:mm tt")</p>
                     </div>
                 </div>
+
+                @if (!string.IsNullOrWhiteSpace(Model.AttachmentPath))
+                {
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Attachment:</label>
+                            <div class="mt-2">
+                                @await Html.PartialAsync("_TaskAttachment", Model)
+                            </div>
+                        </div>
+                    </div>
+                }
             </div>
         </div>
     </div>
@@ -86,7 +113,7 @@
                             }
                             @if (Model.Status != TaskStatus.Completed)
                             {
-                                <option value="Completed">Completed</option>
+                                <option value="Completed">Completed (Send for Admin Approval)</option>
                             }
                             @if (Model.Status != TaskStatus.Cancelled)
                             {
@@ -99,9 +126,13 @@
                         <textarea name="UpdateDescription" class="form-control" rows="3" placeholder="Add update notes..."></textarea>
                     </div>
                     <button type="submit" class="btn btn-success w-100">
-                        <i class="bi bi-check-lg"></i> Update Status
+                        <i class="bi bi-check-lg"></i> Save Status
                     </button>
                 </form>
+
+                <div class="alert alert-info mt-3 mb-0 py-2">
+                    <small>Choosing Completed sends the task to admin for final approval. The task stays In Progress until approved.</small>
+                </div>
 
                 <hr />
 

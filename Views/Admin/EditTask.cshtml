@@ -50,6 +50,16 @@
                         <span asp-validation-for="DueDate" class="text-danger"></span>
                     </div>
 
+                    @if (!string.IsNullOrWhiteSpace(Model.AttachmentPath))
+                    {
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Current Attachment</label>
+                            <div class="mt-2">
+                                @await Html.PartialAsync("_TaskAttachment", Model)
+                            </div>
+                        </div>
+                    }
+
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                         <a asp-action="TaskList" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Cancel

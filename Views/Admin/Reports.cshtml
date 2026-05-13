@@ -5,9 +5,53 @@
     var departmentName = User.FindFirst("DepartmentName")?.Value;
 }
 
+<style>
+    @@media print {
+        header,
+        nav.sidebar,
+        .print-hide,
+        .btn,
+        .alert {
+            display: none !important;
+        }
+
+        body {
+            padding-top: 0 !important;
+            margin: 0 !important;
+            background: #fff !important;
+        }
+
+        main {
+            width: 100% !important;
+            max-width: 100% !important;
+            flex: 0 0 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .card {
+            border: 0 !important;
+            box-shadow: none !important;
+        }
+
+        .table {
+            page-break-inside: auto;
+        }
+
+        .table thead {
+            display: table-header-group;
+        }
+
+        .table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+    }
+</style>
+
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2"><i class="bi bi-file-earmark-bar-graph"></i> Department Reports</h1>
-    <button onclick="window.print()" class="btn btn-primary">
+    <button type="button" onclick="window.print()" class="btn btn-primary print-hide">
         <i class="bi bi-printer"></i> Print Report
     </button>
 </div>
@@ -45,6 +89,7 @@
                         <th>Assigned To</th>
                         <th>Priority</th>
                         <th>Status</th>
+                        <th>Attachment</th>
                         <th>Created Date</th>
                         <th>Due Date</th>
                     </tr>
@@ -58,6 +103,16 @@
                             <td>@task.AssignedToUser.FullName</td>
                             <td>@task.Priority</td>
                             <td>@task.Status</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(task.AttachmentPath))
+                                {
+                                    @await Html.PartialAsync("_TaskAttachment", task, new ViewDataDictionary(ViewData) { ["Compact"] = true })
+                                }
+                                else
+                                {
+                                    <span class="text-muted">None</span>
+                                }
+                            </td>
                             <td>@task.CreatedDate.ToString("MMM dd, yyyy")</td>
                             <td>@(task.DueDate?.ToString("MMM dd, yyyy") ?? "N/A")</td>
                         </tr>

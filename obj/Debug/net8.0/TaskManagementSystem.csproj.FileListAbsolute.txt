@@ -137,3 +137,9 @@ C:\Users\Hivenevigator\Desktop\TaskManagementSystem\obj\Debug\net8.0\TaskManagem
 C:\Users\Hivenevigator\Desktop\TaskManagementSystem\obj\Debug\net8.0\TaskManagementSystem.genruntimeconfig.cache
 C:\Users\Hivenevigator\Desktop\TaskManagementSystem\obj\Debug\net8.0\ref\TaskManagementSystem.dll
 C:\Users\Hivenevigator\Desktop\TaskManagementSystem\obj\Debug\net8.0\TaskManagementSystem.sourcelink.json
+C:\Users\Hivenevigator\Desktop\TaskManagementSystem\bin\Debug\net8.0\artifacts\iis-publish\web.config
+C:\Users\Hivenevigator\Desktop\TaskManagementSystem\bin\Debug\net8.0\artifacts\iis-publish\appsettings.Development.json
+C:\Users\Hivenevigator\Desktop\TaskManagementSystem\bin\Debug\net8.0\artifacts\iis-publish\appsettings.json
+C:\Users\Hivenevigator\Desktop\TaskManagementSystem\bin\Debug\net8.0\artifacts\iis-publish\TaskManagementSystem.deps.json
+C:\Users\Hivenevigator\Desktop\TaskManagementSystem\bin\Debug\net8.0\artifacts\iis-publish\TaskManagementSystem.runtimeconfig.json
+C:\Users\Hivenevigator\Desktop\TaskManagementSystem\bin\Debug\net8.0\artifacts\iis-publish\TaskManagementSystem.staticwebassets.endpoints.json

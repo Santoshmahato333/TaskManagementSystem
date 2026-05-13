@@ -22,5 +22,8 @@ namespace TaskManagementSystem.ViewModels
         [Display(Name = "Due Date")]
         [DataType(DataType.DateTime)]
         public DateTime? DueDate { get; set; }
+
+        [Display(Name = "Attach File (PDF or Image)")]
+        public IFormFile? AttachmentFile { get; set; }
     }
 }

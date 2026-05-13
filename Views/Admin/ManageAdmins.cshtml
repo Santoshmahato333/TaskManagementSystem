@@ -1,0 +1,108 @@
+@model List<User>
+@{
+    ViewData["Title"] = "Manage Admins";
+}
+
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <h1 class="h2"><i class="bi bi-shield-lock"></i> Manage Admin Accounts</h1>
+    <a asp-controller="Account" asp-action="Register" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Create New Admin
+    </a>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle"></i> @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle"></i> @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (Model.Any())
+{
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Full Name</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Roles</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Created Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var admin in Model)
+                        {
+                            <tr>
+                                <td><strong>@admin.FullName</strong></td>
+                                <td>@admin.Username</td>
+                                <td>
+                                    <a href="mailto:@admin.Email">@admin.Email</a>
+                                </td>
+                                <td>@(admin.PhoneNumber ?? "N/A")</td>
+                                <td>
+                                    @foreach (var role in admin.UserRoles)
+                                    {
+                                        <span class="badge bg-info">@role.Role.RoleName</span>
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                                        var departments = string.Join(", ", admin.UserRoles.Select(ur => ur.Department.DepartmentName).Distinct());
+                                    }
+                                    @departments
+                                </td>
+                                <td>
+                                    @if (admin.IsActive)
+                                    {
+                                        <span class="badge bg-success">Active</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Inactive</span>
+                                    }
+                                </td>
+                                <td>@admin.CreatedDate.ToString("MMM dd, yyyy")</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a asp-action="EditAdmin" asp-route-id="@admin.UserId" class="btn btn-outline-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i> Edit
+                                        </a>
+                                        <form method="post" asp-action="DeleteAdmin" asp-route-id="@admin.UserId" style="display:inline;" 
+                                              onsubmit="return confirm('Are you sure you want to delete this admin account? This action cannot be undone.');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete">
+                                                <i class="bi bi-trash"></i> Delete
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i> No admin accounts found. 
+        <a asp-controller="Account" asp-action="Register" class="alert-link">Create a new admin account</a>
+    </div>
+}

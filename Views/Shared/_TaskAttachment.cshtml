@@ -1,0 +1,42 @@
+@model TaskManagementSystem.Models.TaskItem
+@{
+    var compact = ViewData["Compact"] is bool compactValue && compactValue;
+    var fileName = Model.AttachmentFileName ?? System.IO.Path.GetFileName(Model.AttachmentPath ?? string.Empty);
+    var extension = System.IO.Path.GetExtension(fileName).ToLowerInvariant();
+    var isImage = extension == ".jpg" || extension == ".jpeg" || extension == ".png" || extension == ".gif" || extension == ".bmp" || extension == ".webp";
+    var isPdf = extension == ".pdf";
+}
+
+@if (!string.IsNullOrWhiteSpace(Model.AttachmentPath))
+{
+    <div class="task-attachment @(compact ? "task-attachment-compact" : "task-attachment-detailed")">
+        @if (isImage)
+        {
+            <a href="@Model.AttachmentPath" target="_blank" rel="noopener">
+                <img src="@Model.AttachmentPath"
+                     alt="@fileName"
+                     class="@(compact ? "task-attachment-thumb-sm" : "task-attachment-thumb-lg")" />
+            </a>
+        }
+        else if (isPdf)
+        {
+            <div class="alert alert-light border mb-0 @(compact ? "py-2 px-3" : "")">
+                <i class="bi bi-file-earmark-pdf text-danger me-1"></i>
+                <strong>PDF Attachment</strong>
+                <a href="@Model.AttachmentPath" target="_blank" rel="noopener" class="ms-2">Open</a>
+            </div>
+        }
+        else
+        {
+            <div class="alert alert-light border mb-0 @(compact ? "py-2 px-3" : "")">
+                <i class="bi bi-paperclip me-1"></i>
+                <a href="@Model.AttachmentPath" target="_blank" rel="noopener">Download attachment</a>
+            </div>
+        }
+
+        @if (!compact && !string.IsNullOrWhiteSpace(fileName))
+        {
+            <div class="mt-2 small text-muted">@fileName</div>
+        }
+    </div>
+}

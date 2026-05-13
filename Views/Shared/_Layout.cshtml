@@ -67,6 +67,11 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Worker" asp-action="CreateTask">
+                                        <i class="bi bi-plus-circle"></i> Create Task
+                                    </a>
+                                </li>
+                                <li class="nav-item">
                                     <a class="nav-link" asp-controller="Worker" asp-action="MyTasks">
                                         <i class="bi bi-list-check"></i> My Tasks
                                     </a>
@@ -92,10 +97,19 @@
                                     </a>
                                 </li>
                                 <li class="nav-item">
+                                <li class="nav-item">
                                     <a class="nav-link" asp-controller="Admin" asp-action="ManageWorkers">
                                         <i class="bi bi-people"></i> Manage Workers
                                     </a>
                                 </li>
+                                @if (role == "SuperAdmin")
+                                {
+                                    <li class="nav-item">
+                                        <a class="nav-link" asp-controller="Admin" asp-action="ManageAdmins">
+                                            <i class="bi bi-shield-lock"></i> Manage Admins
+                                        </a>
+                                    </li>
+                                }
                                 <li class="nav-item">
                                     <a class="nav-link" asp-controller="Account" asp-action="Register">
                                         <i class="bi bi-person-plus"></i> Add User

@@ -11,7 +11,7 @@
     <div class="col-md-8 offset-md-2">
         <div class="card shadow">
             <div class="card-body">
-                <form method="post" asp-action="CreateTask">
+                <form method="post" asp-action="CreateTask" enctype="multipart/form-data">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
                     <div class="mb-3">
@@ -45,6 +45,13 @@
                         <label asp-for="DueDate" class="form-label"></label>
                         <input asp-for="DueDate" type="datetime-local" class="form-control" />
                         <span asp-validation-for="DueDate" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="AttachmentFile" class="form-label"></label>
+                        <input asp-for="AttachmentFile" type="file" class="form-control" accept=".pdf,.jpg,.jpeg,.png,.gif" />
+                        <small class="form-text text-muted">Supported formats: PDF, JPG, PNG, GIF (Max 10MB)</small>
+                        <span asp-validation-for="AttachmentFile" class="text-danger"></span>
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">

@@ -8,6 +8,7 @@ using TaskManagementSystem.Services;
 using TaskManagementSystem.ViewModels;
 using TaskStatus = TaskManagementSystem.Models.TaskStatus;
 using TaskPriority = TaskManagementSystem.Models.TaskPriority;
+using System.IO;
 
 namespace TaskManagementSystem.Controllers
 {
@@ -16,17 +17,25 @@ namespace TaskManagementSystem.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IUserService _userService;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public WorkerController(ApplicationDbContext context, IUserService userService)
+        public WorkerController(ApplicationDbContext context, IUserService userService, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _userService = userService;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             return int.Parse(userIdClaim ?? "0");
+        }
+
+        private int GetCurrentDepartmentId()
+        {
+            var departmentIdClaim = User.FindFirst("DepartmentId")?.Value;
+            return int.Parse(departmentIdClaim ?? "0");
         }
 
         [HttpGet]
@@ -98,6 +107,103 @@ namespace TaskManagementSystem.Controllers
         }
 
         [HttpGet]
+        public IActionResult CreateTask()
+        {
+            var model = new CreateTaskViewModel
+            {
+                AssignedToUserId = GetCurrentUserId(),
+                Priority = TaskPriority.Medium
+            };
+
+            ViewBag.Priorities = Enum.GetValues(typeof(TaskPriority));
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateTask(CreateTaskViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Priorities = Enum.GetValues(typeof(TaskPriority));
+                return View(model);
+            }
+
+            var userId = GetCurrentUserId();
+            var departmentId = GetCurrentDepartmentId();
+
+            var task = new TaskItem
+            {
+                Title = model.Title,
+                Description = model.Description,
+                DepartmentId = departmentId,
+                AssignedToUserId = userId,
+                CreatedByUserId = userId,
+                Priority = model.Priority,
+                Status = TaskStatus.Pending,
+                DueDate = model.DueDate,
+                CreatedDate = DateTime.Now
+            };
+
+            // Handle file upload
+            if (model.AttachmentFile != null && model.AttachmentFile.Length > 0)
+            {
+                const long maxFileSize = 10 * 1024 * 1024; // 10MB
+                var allowedExtensions = new[] { ".pdf", ".jpg", ".jpeg", ".png", ".gif" };
+
+                if (model.AttachmentFile.Length > maxFileSize)
+                {
+                    ModelState.AddModelError("AttachmentFile", "File size cannot exceed 10MB.");
+                    ViewBag.Priorities = Enum.GetValues(typeof(TaskPriority));
+                    return View(model);
+                }
+
+                var fileExtension = Path.GetExtension(model.AttachmentFile.FileName).ToLower();
+                if (!allowedExtensions.Contains(fileExtension))
+                {
+                    ModelState.AddModelError("AttachmentFile", "Only PDF, JPG, PNG, and GIF files are allowed.");
+                    ViewBag.Priorities = Enum.GetValues(typeof(TaskPriority));
+                    return View(model);
+                }
+
+                // Generate unique filename
+                var fileName = $"{Guid.NewGuid()}_{DateTime.Now:yyyyMMddHHmmss}{fileExtension}";
+                var uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+
+                // Create uploads directory if it doesn't exist
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var filePath = Path.Combine(uploadsFolder, fileName);
+
+                try
+                {
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await model.AttachmentFile.CopyToAsync(fileStream);
+                    }
+
+                    task.AttachmentFileName = model.AttachmentFile.FileName;
+                    task.AttachmentPath = $"/uploads/{fileName}";
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("AttachmentFile", $"Error uploading file: {ex.Message}");
+                    ViewBag.Priorities = Enum.GetValues(typeof(TaskPriority));
+                    return View(model);
+                }
+            }
+
+            _context.Tasks.Add(task);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Task created successfully!";
+            return RedirectToAction("MyTasks");
+        }
+
+        [HttpGet]
         public async Task<IActionResult> ViewTaskDetails(int id)
         {
             var userId = GetCurrentUserId();
@@ -137,23 +243,44 @@ namespace TaskManagementSystem.Controllers
                 return NotFound();
             }
 
+            var isCompletionRequest = model.NewStatus == TaskStatus.Completed;
+            var previousStatus = task.Status;
+            var effectiveStatus = isCompletionRequest ? TaskStatus.InProgress : model.NewStatus;
+
+            var updateDescription = model.UpdateDescription;
+            if (isCompletionRequest)
+            {
+                updateDescription = string.IsNullOrWhiteSpace(updateDescription)
+                    ? "Worker marked the task as completed and sent it for admin approval."
+                    : $"{updateDescription.Trim()} (Worker marked the task as completed and sent it for admin approval.)";
+            }
+
             var taskUpdate = new TaskUpdate
             {
                 TaskId = task.TaskId,
                 UpdatedByUserId = userId,
-                UpdateDescription = model.UpdateDescription,
-                OldStatus = task.Status,
-                NewStatus = model.NewStatus,
+                UpdateDescription = updateDescription,
+                OldStatus = previousStatus,
+                NewStatus = effectiveStatus,
                 UpdatedDate = DateTime.Now
             };
 
-            task.Status = model.NewStatus;
+            if (isCompletionRequest)
+            {
+                taskUpdate.UpdateDescription = string.IsNullOrWhiteSpace(model.UpdateDescription)
+                    ? "Worker submitted the task for admin approval."
+                    : $"{model.UpdateDescription.Trim()} (Worker submitted the task for admin approval.)";
+            }
+
+            task.Status = effectiveStatus;
             task.UpdatedDate = DateTime.Now;
 
             _context.TaskUpdates.Add(taskUpdate);
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Task status updated successfully!";
+            TempData["SuccessMessage"] = isCompletionRequest
+                ? "Task submitted for admin approval."
+                : "Task status updated successfully!";
             return RedirectToAction("ViewTaskDetails", new { id = model.TaskId });
         }
 

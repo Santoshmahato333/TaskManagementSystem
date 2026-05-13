@@ -52,6 +52,15 @@ namespace TaskManagementSystem.Models
 
         public DateTime? UpdatedDate { get; set; }
 
+        [StringLength(500)]
+        public string? AttachmentFileName { get; set; }
+
+        [StringLength(500)]
+        public string? AttachmentPath { get; set; }
+
+        [NotMapped]
+        public bool ApproveAsCompleted { get; set; }
+
         // Navigation Properties
         [ForeignKey("DepartmentId")]
         public virtual Department Department { get; set; } = null!;

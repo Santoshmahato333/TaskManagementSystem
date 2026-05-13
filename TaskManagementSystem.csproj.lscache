@@ -61,8 +61,10 @@ Controllers/
  WorkerController.cs
 DataLayer/ApplicationDbContext.cs
 Migrations/
- 20260105080810_InitialCreate.cs
- 20260105080810_InitialCreate.Designer.cs
+ 20260510130517_initial.cs
+ 20260510130517_initial.Designer.cs
+ 20260510131027_InitialCreate.cs
+ 20260510131027_InitialCreate.Designer.cs
  ApplicationDbContextModelSnapshot.cs
 Models/
  Department.cs
@@ -462,7 +464,10 @@ Views/Account/
 Views/Admin/
  CreateTask.cshtml
  Dashboard.cshtml
+ EditAdmin.cshtml
  EditTask.cshtml
+ EditUser.cshtml
+ ManageAdmins.cshtml
  ManageWorkers.cshtml
  Reports.cshtml
  TaskList.cshtml
@@ -473,8 +478,10 @@ Views/Home/
 Views/Shared/
  Error.cshtml
  _Layout.cshtml
+ _TaskAttachment.cshtml
  _ValidationScriptsPartial.cshtml
 Views/Worker/
+ CreateTask.cshtml
  Dashboard.cshtml
  MyTasks.cshtml
  ViewTaskDetails.cshtml
@@ -490,7 +497,10 @@ Views/Account/
 Views/Admin/
  CreateTask.cshtml
  Dashboard.cshtml
+ EditAdmin.cshtml
  EditTask.cshtml
+ EditUser.cshtml
+ ManageAdmins.cshtml
  ManageWorkers.cshtml
  Reports.cshtml
  TaskList.cshtml
@@ -501,8 +511,10 @@ Views/Home/
 Views/Shared/
  Error.cshtml
  _Layout.cshtml
+ _TaskAttachment.cshtml
  _ValidationScriptsPartial.cshtml
 Views/Worker/
+ CreateTask.cshtml
  Dashboard.cshtml
  MyTasks.cshtml
  ViewTaskDetails.cshtml

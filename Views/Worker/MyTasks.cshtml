@@ -7,6 +7,9 @@
 
 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
     <h1 class="h2"><i class="bi bi-list-check"></i> My Tasks</h1>
+    <a asp-action="CreateTask" class="btn btn-primary">
+        <i class="bi bi-plus-circle"></i> Create Task
+    </a>
 </div>
 
 <div class="card shadow mb-3">
@@ -73,6 +76,12 @@
                                     @if (!string.IsNullOrEmpty(task.Description))
                                     {
                                         <br /><small class="text-muted">@task.Description.Substring(0, Math.Min(100, task.Description.Length))@(task.Description.Length > 100 ? "..." : "")</small>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(task.AttachmentPath))
+                                    {
+                                        <div class="mt-2">
+                                            @await Html.PartialAsync("_TaskAttachment", task, new ViewDataDictionary(ViewData) { ["Compact"] = true })
+                                        </div>
                                     }
                                 </td>
                                 <td>@task.CreatedByUser.FullName</td>

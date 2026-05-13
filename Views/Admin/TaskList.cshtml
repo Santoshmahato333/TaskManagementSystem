@@ -26,18 +26,18 @@
                 <div class="col-md-2">
                     <select name="Status" class="form-select">
                         <option value="">All Status</option>
-                        @foreach (var status in ViewBag.Statuses)
+                        @foreach (var item in ViewBag.Statuses)
                         {
-                            <option value="@status" selected="@(filter?.Status?.ToString() == status.ToString())">@status</option>
+                            <option value="@item.Value" selected="@(filter?.Status?.ToString() == item.Text)">@item.Text</option>
                         }
                     </select>
                 </div>
                 <div class="col-md-2">
                     <select name="Priority" class="form-select">
                         <option value="">All Priority</option>
-                        @foreach (var priority in ViewBag.Priorities)
+                        @foreach (var item in ViewBag.Priorities)
                         {
-                            <option value="@priority" selected="@(filter?.Priority?.ToString() == priority.ToString())">@priority</option>
+                            <option value="@item.Value" selected="@(filter?.Priority?.ToString() == item.Text)">@item.Text</option>
                         }
                     </select>
                 </div>
@@ -80,6 +80,12 @@
                                 <td>
                                     <strong>@task.Title</strong><br>
                                     <small class="text-muted">@(task.Description != null && task.Description.Length > 50 ? task.Description.Substring(0, 50) + "..." : task.Description)</small>
+                                    @if (!string.IsNullOrWhiteSpace(task.AttachmentPath))
+                                    {
+                                        <div class="mt-2">
+                                            @await Html.PartialAsync("_TaskAttachment", task, new ViewDataDictionary(ViewData) { ["Compact"] = true })
+                                        </div>
+                                    }
                                 </td>
                                 <td>@task.AssignedToUser.FullName</td>
                                 <td>
@@ -134,6 +140,16 @@
                                         <a asp-action="ViewTaskDetails" asp-route-id="@task.TaskId" class="btn btn-outline-primary" title="View">
                                             <i class="bi bi-eye"></i>
                                         </a>
+                                        @if (task.DueDate.HasValue && task.DueDate.Value < DateTime.Now && task.Status != TaskStatus.Completed)
+                                        {
+                                            <form method="post" asp-action="SendOverdueReminder" asp-route-id="@task.TaskId" style="display:inline;">
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="reminderMessage" value="Reminder: This task is overdue. Please review and complete it as soon as possible." />
+                                                <button type="submit" class="btn btn-outline-danger btn-sm" title="Send Reminder" onclick="return confirm('Send an overdue reminder to the worker?');">
+                                                    <i class="bi bi-bell"></i>
+                                                </button>
+                                            </form>
+                                        }
                                         <a asp-action="EditTask" asp-route-id="@task.TaskId" class="btn btn-outline-warning" title="Edit">
                                             <i class="bi bi-pencil"></i>
                                         </a>

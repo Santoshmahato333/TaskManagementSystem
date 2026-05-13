@@ -47,10 +47,22 @@
                                 </td>
                                 <td>@worker.CreatedDate.ToString("MMM dd, yyyy")</td>
                                 <td>
-                                    <a asp-action="TaskList" asp-route-AssignedToUserId="@worker.UserId" 
-                                       class="btn btn-sm btn-outline-primary" title="View Tasks">
-                                        <i class="bi bi-list-task"></i> Tasks
-                                    </a>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="TaskList" asp-route-AssignedToUserId="@worker.UserId" 
+                                           class="btn btn-outline-primary" title="View Tasks">
+                                            <i class="bi bi-list-task"></i>
+                                        </a>
+                                        <a asp-action="EditUser" asp-route-id="@worker.UserId" 
+                                           class="btn btn-outline-warning" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <form method="post" asp-action="DeleteUser" asp-route-id="@worker.UserId" style="display:inline;" 
+                                              onsubmit="return confirm('Are you sure you want to delete this user?');">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm" title="Delete">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         }
